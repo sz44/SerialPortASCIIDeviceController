@@ -1,6 +1,7 @@
 {
 	"Device001": {
 		"id": "001",
+		"type": "aligner",
 		"connection_type": "serialport",
 		"connection_config": {
 			"port": 3,
@@ -8,11 +9,6 @@
 			"Parity": 0,
 			"DataBits": 8,
 			"StopBits": 1
-		},
-		"commands": {
-			"moveup": "MoveUp",
-			"movedown": "MoveDown",
-			"status": "GetStatus"
 		}
 	},
 	"Device002": {
@@ -24,11 +20,6 @@
 			"Parity": 0,
 			"DataBits": 8,
 			"StopBits": 1
-		},
-		"commands": {
-			"vacon": "SetVacuumOn",
-			"vacoff": "SetVacuumOff",
-			"status": "GetStatus"
 		}
 	}
 }

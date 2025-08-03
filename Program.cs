@@ -4,44 +4,138 @@ using System.Text.Json;
 /*using System.IO.Ports;*/
 
 
-void init()
+//////////////////// PROGRAM START /////////////////////////////
+var options = new JsonSerializerOptions
 {
-    var options = new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true
-    };
+    PropertyNameCaseInsensitive = true
+};
 
 
+try
+{
     string json = File.ReadAllText("devices.json");
     var deviceMap = JsonSerializer.Deserialize<DeviceMap>(json, options);
-    if (deviceMap == null) { return; }
-
+    if (deviceMap == null)
+    {
+        Console.WriteLine($"JSON deserialized into null");
+        return;
+    }
 
     foreach (var (deviceName, device) in deviceMap)
     {
         device.CreateConnection();
-        /*Console.WriteLine(device.Connection.PortName);*/
         device.Connect();
-        /*connections[deviceName] = conn;*/
-        /*dispatchTable[deviceName] = device.Commands;*/
     }
 
-    var consoleUI = new ConsoleUI();
-}
-init();
+    var commandProcessor = new CommandProcessor(deviceMap);
 
+    var consoleUI = new ConsoleUI(commandProcessor);
+    await consoleUI.Start();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error: {ex.Message}");
+    return;
+}
+
+
+/////////////////////////////////////////////////////////////////
 public class ConsoleUI
 {
-    public ConsoleUI()
+    private CommandProcessor CommandProcessor;
+    private CancellationTokenSource CancellationTokenSource;
+    private bool isRunning = false;
+
+    public ConsoleUI(CommandProcessor commandProccesor)
     {
+        CommandProcessor = commandProccesor;
+        CancellationTokenSource = new CancellationTokenSource();
     }
-    public void start()
+
+    public async Task Start()
     {
-        Console.Write("Command:");
-        while (true)
+        if (isRunning)
         {
-            string input = Console.ReadLine();
+            Console.WriteLine("Console is already running.");
+            return;
         }
+
+        try
+        {
+            isRunning = true;
+            Console.WriteLine("Console App Started. Type 'quit' to exit.");
+            Console.Write("Command: ");
+
+            // Start the input loop asynchronously
+            await InputLoopAsync(CancellationTokenSource.Token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting console: {ex.Message}");
+        }
+    }
+
+    private async Task InputLoopAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (!cancellationToken.IsCancellationRequested && isRunning)
+            {
+                // Use Task.Run to make Console.ReadLine non-blocking
+                string input = await Task.Run(() => Console.ReadLine(), cancellationToken);
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.Write("Command: ");
+                    continue;
+                }
+
+                // Check for quit command
+                if (input.Trim().ToLower() == "quit")
+                {
+                    await EndAsync();
+                    break;
+                }
+
+                // Send command to serial port and handle response
+                await CommandProcessor.ProcessCommand(input);
+
+                if (isRunning) // Only show prompt if still running
+                {
+                    Console.Write("Command: ");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("\nInput loop cancelled.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in input loop: {ex.Message}");
+        }
+    }
+}
+
+public class CommandProcessor
+{
+    Dictionary<string, Device> DeviceMap;
+
+    public CommandProcessor(Dictionary<string, Device> deviceMap)
+    {
+        DeviceMap = deviceMap;
+    }
+
+    public void ProcessCommand(Command cmd)
+    {
+        var found = DeviceMap.TryGetValue(cmd.DeviceID, out Device device);
+        if (!found)
+        {
+            Console.WriteLine("command failed, could not find deviceId");
+            return;
+        }
+        var msg = cmd.Action + " " + cmd.Value;
+        device.Connection.WriteString(msg);
     }
 }
 
@@ -109,21 +203,6 @@ public abstract class Device
     }
 }
 
-public class Device001 : Device
-{
-    public void MoveUp() { }
-    public void MoveDown() { }
-    public void GetStatus() { }
-}
-
-public class Device002 : Device
-{
-    public void SetVacuumOn() { }
-    public void SetVacuumOff() { }
-    public void SetAngle(int value) { }
-    public void GetStatus() { }
-}
-
 public class ConnectionConfig
 {
     public int Port { get; set; }
@@ -150,7 +229,14 @@ public class SerialConnection
     }
     public void OpenPort() { }
     public void ClosePort() { }
-    public void Write(byte[] request) { }
+    public void Write(byte[] request)
+    {
+        Console.WriteLine($"wrote: {request}");
+    }
+    public void WriteString(string request)
+    {
+        Console.WriteLine($"wrote: {request}");
+    }
     public string Read()
     {
         return "Mock Device Read Response";
