@@ -2,17 +2,28 @@
 using System.Text.Json;
 /*using System.IO.Ports;*/
 
-var options = new JsonSerializerOptions
-{
-    PropertyNameCaseInsensitive = true
-};
 
-Console.WriteLine("Hello, World!");
-string json = File.ReadAllText("devices.json");
-var deviceMap = JsonSerializer.Deserialize<DeviceConfig>(json, options);
-var device001 = deviceMap.First();
-Console.WriteLine(device001);
-Console.WriteLine(device001.Value.Id);
+void setup()
+{
+
+    var options = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    string json = File.ReadAllText("devices.json");
+    var deviceMap = JsonSerializer.Deserialize<DeviceConfig>(json, options);
+    var device001 = deviceMap.First();
+    var devices = deviceMap.Values;
+    /*Console.WriteLine(device001);*/
+    foreach (var val in devices)
+    {
+        Console.WriteLine(val.Id);
+    }
+    /*Console.WriteLine(device001.GetType());*/
+    /*Console.WriteLine(device001.Value.Id);*/
+}
+setup();
 /*Console.WriteLine(deviceMap.Keys.First());*/
 
 public class DeviceConfig : Dictionary<string, Device> { }
