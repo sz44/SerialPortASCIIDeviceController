@@ -18,27 +18,36 @@ void init()
     {
         return;
     }
+
+    var devices = new DeviceRegistry();
+
     foreach (var (deviceName, device) in deviceMap)
     {
         device.CreateConnection();
-        Console.WriteLine(device.Connection.PortName);
+        /*Console.WriteLine(device.Connection.PortName);*/
+        device.Connect();
         /*connections[deviceName] = conn;*/
         /*dispatchTable[deviceName] = device.Commands;*/
+        devices.register(deviceName, device);
     }
 }
 init();
 
-/*class DeviceRegistry {*/
-/*    private final Map<String, Device> devices = new HashMap<>();*/
-/**/
-/*    public void register(String deviceId, Device device) {*/
-/*        devices.put(deviceId, device);*/
-/*    }*/
-/**/
-/*    public Device getDevice(String deviceId) {*/
-/*        return devices.get(deviceId);*/
-/*    }*/
-/*}*/
+//Is this really needed?
+class DeviceRegistry
+{
+    private readonly Dictionary<String, Device> devices;
+
+    public void register(String deviceId, Device device)
+    {
+        devices.Add(deviceId, device);
+    }
+
+    public Device getDevice(String deviceId)
+    {
+        return devices[deviceId];
+    }
+}
 
 public class UserMessageQueue
 {
@@ -96,6 +105,11 @@ public class Device
     public void CreateConnection()
     {
         Connection = new SerialConnection(Connection_Config);
+    }
+    public void Connect()
+    {
+        if (Connection == null) { return; }
+        Connection.OpenPort();
     }
 }
 
