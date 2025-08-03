@@ -10,9 +10,9 @@
 			"StopBits": 1
 		},
 		"commands": {
-			"moveup": "move_up",
-			"movedown": "move_down",
-			"status": "get_status"
+			"moveup": "MoveUp",
+			"movedown": "MoveDown",
+			"status": "GetStatus"
 		}
 	},
 	"Device002": {
@@ -26,9 +26,9 @@
 			"StopBits": 1
 		},
 		"commands": {
-			"vacon": "set_vacuum_on",
-			"vacoff": "set_vacuum_off",
-			"status": "get_status"
+			"vacon": "SetVacuumOn",
+			"vacoff": "SetVacuumOff",
+			"status": "GetStatus"
 		}
 	}
 }

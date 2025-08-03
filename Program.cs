@@ -13,13 +13,9 @@ void init()
 
 
     string json = File.ReadAllText("devices.json");
-    var deviceMap = JsonSerializer.Deserialize<DeviceConfig>(json, options);
-    if (deviceMap == null)
-    {
-        return;
-    }
+    var deviceMap = JsonSerializer.Deserialize<DeviceMap>(json, options);
+    if (deviceMap == null) { return; }
 
-    var devices = new DeviceRegistry();
 
     foreach (var (deviceName, device) in deviceMap)
     {
@@ -28,24 +24,24 @@ void init()
         device.Connect();
         /*connections[deviceName] = conn;*/
         /*dispatchTable[deviceName] = device.Commands;*/
-        devices.register(deviceName, device);
     }
+
+    var consoleUI = new ConsoleUI();
 }
 init();
 
-//Is this really needed?
-class DeviceRegistry
+public class ConsoleUI
 {
-    private readonly Dictionary<String, Device> devices;
-
-    public void register(String deviceId, Device device)
+    public ConsoleUI()
     {
-        devices.Add(deviceId, device);
     }
-
-    public Device getDevice(String deviceId)
+    public void start()
     {
-        return devices[deviceId];
+        Console.Write("Command:");
+        while (true)
+        {
+            string input = Console.ReadLine();
+        }
     }
 }
 
@@ -92,9 +88,9 @@ public class Command
     }
 }
 
-public class DeviceConfig : Dictionary<string, Device> { }
+public class DeviceMap : Dictionary<string, Device> { }
 
-public class Device
+public abstract class Device
 {
     public required string Id { get; set; }
     public required string Connection_Type { get; set; }
@@ -111,6 +107,21 @@ public class Device
         if (Connection == null) { return; }
         Connection.OpenPort();
     }
+}
+
+public class Device001 : Device
+{
+    public void MoveUp() { }
+    public void MoveDown() { }
+    public void GetStatus() { }
+}
+
+public class Device002 : Device
+{
+    public void SetVacuumOn() { }
+    public void SetVacuumOff() { }
+    public void SetAngle(int value) { }
+    public void GetStatus() { }
 }
 
 public class ConnectionConfig
