@@ -1,0 +1,34 @@
+{
+	"Device001": {
+		"id": "001",
+		"connection_type": "serialport",
+		"connection_config": {
+			"port": 3,
+			"baud": 9600,
+			"Parity": 0,
+			"DataBits": 8,
+			"StopBits": 1
+		},
+		"commands": {
+			"moveup": "move_up",
+			"movedown": "move_down",
+			"status": "get_status"
+		}
+	},
+	"Device002": {
+		"id": "002",
+		"connection_type": "serialport",
+		"connection_config": {
+			"port": 4,
+			"baud": 9600,
+			"Parity": 0,
+			"DataBits": 8,
+			"StopBits": 1
+		},
+		"commands": {
+			"vacon": "set_vacuum_on",
+			"vacoff": "set_vacuum_off",
+			"status": "get_status"
+		}
+	}
+}
