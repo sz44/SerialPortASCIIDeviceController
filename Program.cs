@@ -1,30 +1,87 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.Collections.Concurrent;
 using System.Text.Json;
 /*using System.IO.Ports;*/
 
 
-void setup()
+void init()
 {
-
     var options = new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true
     };
 
+
     string json = File.ReadAllText("devices.json");
     var deviceMap = JsonSerializer.Deserialize<DeviceConfig>(json, options);
-    var device001 = deviceMap.First();
-    var devices = deviceMap.Values;
-    /*Console.WriteLine(device001);*/
-    foreach (var val in devices)
+    if (deviceMap == null)
     {
-        Console.WriteLine(val.Id);
+        return;
     }
-    /*Console.WriteLine(device001.GetType());*/
-    /*Console.WriteLine(device001.Value.Id);*/
+    foreach (var (deviceName, device) in deviceMap)
+    {
+        device.CreateConnection();
+        Console.WriteLine(device.Connection.PortName);
+        /*connections[deviceName] = conn;*/
+        /*dispatchTable[deviceName] = device.Commands;*/
+    }
 }
-setup();
-/*Console.WriteLine(deviceMap.Keys.First());*/
+init();
+
+/*class DeviceRegistry {*/
+/*    private final Map<String, Device> devices = new HashMap<>();*/
+/**/
+/*    public void register(String deviceId, Device device) {*/
+/*        devices.put(deviceId, device);*/
+/*    }*/
+/**/
+/*    public Device getDevice(String deviceId) {*/
+/*        return devices.get(deviceId);*/
+/*    }*/
+/*}*/
+
+public class UserMessageQueue
+{
+    BlockingCollection<Message> Queue;
+    public UserMessageQueue()
+    {
+        Queue = new BlockingCollection<Message>();
+    }
+    public void put(Message msg) { }
+    public void get() { }
+}
+
+public class UserMessageProcessor
+{
+    public UserMessageProcessor()
+    {
+
+    }
+}
+
+public class Message
+{
+    public string Data { get; set; }
+
+    public Message(string data)
+    {
+        Data = data;
+    }
+}
+
+public class Command
+{
+    public string DeviceID { get; set; }
+    public string Action { get; set; }
+    public string Value { get; set; }
+
+    public Command(string deviceID, string action, string value)
+    {
+        DeviceID = deviceID;
+        Action = action;
+        Value = value;
+    }
+}
 
 public class DeviceConfig : Dictionary<string, Device> { }
 
@@ -34,10 +91,11 @@ public class Device
     public required string Connection_Type { get; set; }
     public required ConnectionConfig Connection_Config { get; set; }
     public required Dictionary<string, string> Commands { get; set; }
+    public SerialConnection? Connection { get; set; }
 
-    public SerialConnection CreateConnection()
+    public void CreateConnection()
     {
-        return new SerialConnection(Connection_Config);
+        Connection = new SerialConnection(Connection_Config);
     }
 }
 
