@@ -1,9 +1,8 @@
 {
 	"Device001": {
 		"id": "001",
-		"type": "aligner",
-		"connection_type": "serialport",
-		"connection_config": {
+		"connectionType": "serialport",
+		"connectionConfig": {
 			"port": 3,
 			"baud": 9600,
 			"Parity": 0,
@@ -13,8 +12,8 @@
 	},
 	"Device002": {
 		"id": "002",
-		"connection_type": "serialport",
-		"connection_config": {
+		"connectionType": "serialport",
+		"connectionConfig": {
 			"port": 4,
 			"baud": 9600,
 			"Parity": 0,

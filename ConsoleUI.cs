@@ -58,7 +58,7 @@ public class ConsoleUI
                 }
 
                 // Send command to serial port and handle response
-                await CommandProcessor.ProcessCommand(input);
+                CommandProcessor.ProcessCommand(input);
 
                 if (isRunning) // Only show prompt if still running
                 {
