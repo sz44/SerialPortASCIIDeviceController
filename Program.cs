@@ -184,22 +184,32 @@ public class Command
 
 public class DeviceMap : Dictionary<string, Device> { }
 
-public abstract class Device
+// constucted from JSON deserialization
+public class Device
 {
     public required string Id { get; set; }
-    public required string Connection_Type { get; set; }
-    public required ConnectionConfig Connection_Config { get; set; }
-    public required Dictionary<string, string> Commands { get; set; }
-    public SerialConnection? Connection { get; set; }
+    public required string ConnectionType { get; set; }
+    public required ConnectionConfig ConnectionConfig { get; set; }
+    private SerialConnection? Connection;
 
     public void CreateConnection()
     {
-        Connection = new SerialConnection(Connection_Config);
+        Connection = new SerialConnection(ConnectionConfig);
     }
     public void Connect()
     {
         if (Connection == null) { return; }
         Connection.OpenPort();
+    }
+    public void Write(string msg)
+    {
+        if (Connection == null) { return; }
+        Connection.WriteString(msg);
+    }
+    public void Read()
+    {
+        if (Connection == null) { return; }
+        Connection.Read();
     }
 }
 
