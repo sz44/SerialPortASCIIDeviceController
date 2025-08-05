@@ -24,7 +24,7 @@ public class ConsoleUI
         {
             isRunning = true;
             Console.WriteLine("Console App Started. Type 'quit' to exit.");
-            Console.Write("Command: ");
+            /*Console.Write("Command: ");*/
 
             // Start the input loop asynchronously
             await InputLoopAsync(CancellationTokenSource.Token);
@@ -46,7 +46,7 @@ public class ConsoleUI
 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.Write("Command: ");
+                    /*Console.Write("Command: ");*/
                     continue;
                 }
 
@@ -62,7 +62,7 @@ public class ConsoleUI
 
                 if (isRunning) // Only show prompt if still running
                 {
-                    Console.Write("Command: ");
+                    /*Console.Write("Command: ");*/
                 }
             }
         }

@@ -40,7 +40,7 @@ public class MockSerialConnection
     }
     public void Write(string request)
     {
-        DataQueue.Enqueue($"Response to: {request}");
+        DataQueue.Enqueue(request);
     }
     public void StartReadingLoop()
     {

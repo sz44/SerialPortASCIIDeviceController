@@ -9,24 +9,27 @@ public class CommandProcessor
         DeviceMap = deviceMap;
     }
 
-    public Command BuildCommand(string input)
+    public Command? BuildCommand(string input)
     {
-        var res = new List<string>();
+        var parts = input.Split();
 
-        for (int i = 0; i < 2; i++)
+        if (parts.Length < 3)
         {
-            /*int index = input.IndexOf(' ');*/
-            var parts = input.Split(new[] { ' ' }, 2);
-            res.Add(parts[0]);
-            input = parts[1];
+            Console.WriteLine("Not enought values. example: Device001 move 123");
+            return null;
         }
-        Console.WriteLine(res.ToString());
-        return new Command(res[0], res[1], input);
+        var values = parts[2..];
+        return new Command(parts[0], parts[1], String.Join(" ", values));
     }
 
     public void ProcessCommand(string input)
     {
-        Command cmd = BuildCommand(input);
+        Command? cmd = BuildCommand(input);
+        if (cmd == null)
+        {
+            /*Console.WriteLine("Invalid command syntax.");*/
+            return;
+        }
         var found = DeviceMap.TryGetValue(cmd.DeviceID, out Device? device);
         if (!found || device == null)
         {
