@@ -8,16 +8,17 @@ public class Device
     public required string Id { get; set; }
     public required string ConnectionType { get; set; }
     public required ConnectionConfig ConnectionConfig { get; set; }
-    private SerialConnection? Connection;
+    private MockSerialConnection? Connection;
 
     public void CreateConnection()
     {
-        Connection = new SerialConnection(ConnectionConfig);
+        Connection = new MockSerialConnection(ConnectionConfig);
+        Connection.DataReceived += OnDataReceived;
     }
     public void Connect()
     {
         if (Connection == null) { return; }
-        Connection.OpenPort();
+        Connection.Open();
     }
     public void Write(string msg)
     {
@@ -26,7 +27,15 @@ public class Device
     }
     public void Read()
     {
-        if (Connection == null) { return; }
-        Connection.Read();
+        /*if (Connection == null) { return; }*/
+        /*Connection.ReadLine();*/
+    }
+    /*private void OnLineReceived(object? sender, DataLineReceivedEventArgs e)*/
+    /*{*/
+    /*    Console.WriteLine($"[{e.Timestamp:HH:mm:ss.fff}] [{e.DeviceId}] Complete line: {e.LineText}");*/
+    /*}*/
+    private void OnDataReceived(string data)
+    {
+        Console.WriteLine($"Device {Id} received: {data}");
     }
 }
