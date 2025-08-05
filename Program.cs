@@ -24,7 +24,7 @@ try
     var commandProcessor = new CommandProcessor(deviceMap);
 
     var consoleUI = new ConsoleUI(commandProcessor);
-    await consoleUI.Start();
+    consoleUI.Start();
 }
 catch (Exception ex)
 {
